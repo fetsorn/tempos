@@ -1,0 +1,61 @@
+(define piano 2)
+(define pluck 1)
+(define strings 3)
+(define organ 4)
+
+(define *melody* (mkchord 43 '-))
+(define *durs* (list 1/4 1 1 1 1))
+
+(define loop1
+  (lambda (beat melody durs)
+    (let ((dur (car durs))
+          (p (car melody)))
+
+        (play pluck p 60 dur)
+        (play strings (octave (car *melody*) 5) 60 8)
+
+        (at 4 0
+            (play pluck (:mkint p (oneof 12 4 5) ) 50 (* dur 2) ) )
+
+      (callback (*metro* (+ beat dur))
+        'loop1 (+ beat dur)
+        (cdr-or-else melody *melody*)
+        (cdr-or-else durs *durs*)))))
+
+(define loop
+  (lambda (beat melody durs)
+    (let ((dur (car durs))
+          (p (car melody)))
+
+        (at 8 0
+          (set! *melody*
+            (:mkchord (:mkint 48 (cosrfloor 7 7 1/30) 'M)
+            'M (cosrfloor 7 3 1/5))
+          )
+
+          (play organ (octave (car *melody*) 3 4) 60 8 )
+          (play 2 strings (octave (:mkint (car *melody*) 3 'M) 7 9) 50 8 )
+          (play 5/2 strings (octave (:mkint (car *melody*) 5) 3 5) 40 6 )
+          (play 4 strings (octave (:mkint (car *melody*) 12) 7 9) 30 4 )
+        )
+
+
+        (play pluck p 60 (* dur .9) )
+        (play 3/2 pluck (add -12 p) 60 (* dur .9) )
+
+      (at 4 0
+        (play pluck (:mkint p (oneof 12 4 5) ) 50 (* dur 2) )
+        (play (oneof 1 1/2) pluck (:mkint p 24 ) 40 (* dur 2) )
+      )
+
+      (callback (*metro* (+ beat (* 1/2 dur)))
+        'loop (+ beat dur)
+        (cdr-or-else melody *melody*)
+        (cdr-or-else durs *durs*)))))
+
+(define loop (lambda (b m d)))
+(define loop1 (lambda (b m d)))
+
+(loop (*metro* 'get-beat 1) *melody* *durs*)
+
+(loop1 (*metro* 'get-beat 1) *melody* *durs*)
