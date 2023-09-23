@@ -1,0 +1,139 @@
+(define piano 1)
+
+
+(play piano 60 60 8)
+
+(play-note (now) piano (random 60 80) 80 (* 1.0 *second*))
+
+
+(loop (*metro* 'get-beat 1) 60 9)
+
+(define *melody* (mkchord 43 '-))
+(define *durs* (list 1/4 1 1 1 1))
+
+(define loop1
+  (lambda (beat melody durs)
+    (let ((dur (car durs))
+          (p (car melody)))
+
+        (play pluck p 60 dur)
+        (play strings (octave (car *melody*) 5) 60 8)
+
+        (at 4 0
+            (play pluck (:mkint p (oneof 12 4 5) ) 50 (* dur 2) ) )
+
+      (callback (*metro* (+ beat dur))
+        'loop1 (+ beat dur)
+        (cdr-or-else melody *melody*)
+        (cdr-or-else durs *durs*)))))
+
+(define loop
+  (lambda (beat)
+    (let ((dur 10)
+          (p 10))
+
+        (play piano p 60 dur)
+        (play piano (octave 1 5) 60 8)
+
+        (at 4 0
+            (play piano (:mkint p (oneof 12 4 5) ) 50 (* dur 2) ) )
+
+      (callback (*metro* (+ beat dur))
+        'loop (+ beat dur) 1 1))))
+
+(loop (*metro* 'get-beat 1))
+
+(define loop (lambda (b m d)))
+
+(loop (*metro* 'get-beat 1))
+
+(lambda ()
+    (let ((dur 10)
+          (p 10))
+
+        (play piano (octave 1 5) 60 8)
+
+      (callback (*metro* (+ (*metro* 'get-beat 1) 1))
+        'loop (+ (*metro* 'get-beat 1) 1) 1 1)))
+
+(loop (*metro* 'get-beat 1))
+
+(define loop
+  (lambda ()
+        (play piano (octave 1 5) 60 8)
+
+      (callback (*metro* (+ (*metro* 'get-beat 1) 10))
+        'loop (+ (*metro* 'get-beat 1) 10) 1 1)))
+
+(loop (*metro* 'get-beat 1))
+
+(let ((beat (*metro* 'get-beat)))
+  ;; (play piano (:mkmelody 2 60 'dorian '(1 -1 2 -2)) 90 2 )
+  ;; (play piano (list c3 c4) 90 2 )
+  ;; (play piano c2 90 2 )
+
+(define loop
+  (lambda (beat)
+    (play piano (octave 1 5) 60 8)
+
+      (callback (*metro* (+ (*metro* 'get-beat 1) 10))
+        'loop (+ (*metro* 'get-beat 1) 10) 1 1)))
+
+(loop (*metro* 'get-beat 1))
+
+(lambda (beat)
+      (play piano (octave 1 5) 60 8)
+
+    (callback (*metro* (+ (*metro* 'get-beat 1) 10))
+      (lambda ()
+      (play piano (octave 1 5) 60 8))))
+
+(define *melody*
+  (map
+   (lambda (a) (mkchord a '- 3))
+   '(c1 e2)))
+
+(define *melody*
+  (map
+   (lambda (a) (play piano a))
+   '(c1 e2)))
+
+(define *melody*
+  (map (lambda (a) (mkchord (eval a) '-))
+     '(c3 c3 e3 e3 f3 g3 c3 c3
+       c3 c3 e3 e3 f3 g3 c3 c3
+       a3 a3 g3 g3 a3 d3 f#3
+       c3 c3 d3 d3 f3 g3 c3)))
+
+(define c (mkchord c3 '^))
+(define em (mkchord e3 '-))
+(define f (mkchord f3 '^))
+(define g (mkchord g3 '^))
+(define am (mkchord a3 '-))
+(define d (mkchord d3 '^))
+(define f# (mkchord f#3 '^))
+(define dm (mkchord d3 '-))
+
+(define *melody*
+  (map eval
+  '(c c em em f g c c
+    c c em em f g c c
+    am am g g am d f#
+    c c dm dm f g c)))
+
+(println (mkchord 60 '- 8))
+
+(define *durs* (list 2))
+
+(define loop
+  (lambda (beat melody durs)
+    (let ((dur (car durs))
+          (p (car melody)))
+      (play piano (car melody) 50 dur)
+      (callback (*metro* (+ beat dur))
+                'loop (+ beat dur) (cdr-or-else melody *melody*) (cdr-or-else durs *durs*)))))
+
+(loop (*metro* 'get-beat 1) *melody* *durs*)
+
+(print *melody*)
+(define loop (lambda (b m d)))
