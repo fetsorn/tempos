@@ -45,7 +45,7 @@
               "A programming environment for cyberphysical programming";
             homepage = "https://extemporelang.github.io";
             maintainers = [ ];
-            platforms = pkgs.lib.platforms.darwin;
+            platforms = [ pkgs.lib.platforms.darwin pkgs.lib.platforms.linux ];
           };
         };
         lambdamusic = (with pkgs;
@@ -73,7 +73,7 @@
                 " Michele Pasin's custom extensions to the Extempore programming environment";
               homepage = "https://github.com/lambdamusic/extempore-extensions";
               license = licenses.mit;
-              platforms = platforms.darwin;
+              platforms = [ platforms.darwin platforms.linux ];
             };
           });
         preload = pkgs.writeScriptBin "extempore-preload" ''
